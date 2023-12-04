@@ -69,9 +69,36 @@ sub = z.declare_subscriber(args.prefix + '/cams/*', frames_listener)
 while True:
     for cam in list(cams):
         npImage = np.frombuffer(cams[cam], dtype=np.uint8)
-        matImage = cv2.imdecode(npImage, 1)
-        cv2.imshow('Cam #' + cam, matImage)
+        img = cv2.imdecode(npImage, 1)
 
+        # OBJECT DETECTION
+        info_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        L_limit = np.array([40, 40, 40])  # setting the lower limit
+        U_limit = np.array([80, 255, 255])  # setting the upper limit
+        mask = cv2.inRange(info_hsv, L_limit, U_limit)
+        contours, _ = cv2.findContours(
+            mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if contours:
+            # Get the largest contour (assuming it's the target)
+            largest_contour = max(contours, key=cv2.contourArea)
+            # Get the moments to calculate the center of the contour
+            moments = cv2.moments(largest_contour)
+
+            if moments["m00"] != 0:
+                # Calculate centroid x, y coordinates of the contour
+                cx = int(moments["m10"] / moments["m00"])
+                cy = int(moments["m01"] / moments["m00"])
+
+                # Draw a circle at the center
+                cv2.circle(img, (cx, cy), 2, (255, 0, 0), -1)
+                cv2.putText(img, f"Center: ({cx}, {cy})", (cx - 50, cy - 20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            else:
+                print("No center found")
+        else:
+            print("No contours found")
+
+        cv2.imshow('Detected Center', img)
     key = cv2.waitKey(1) & 0xFF
     time.sleep(args.delay)
 
