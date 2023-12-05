@@ -21,6 +21,7 @@ import json
 from dataclasses import dataclass
 from pycdr2 import IdlStruct
 from pycdr2.types import int8, int32, uint32, float64
+from display_video import get_info
 
 
 @dataclass
@@ -133,20 +134,17 @@ def main(stdscr):
         session.put(cmd_vel, t.serialize())
 
     print("Waiting commands with arrow keys or space bar to stop. Press ESC or 'q' to quit.")
-    while True:
-        c = stdscr.getch()
-        if c == curses.KEY_UP:
-            pub_twist(1.0 * linear_scale, 0.0)
-        elif c == curses.KEY_DOWN:
-            pub_twist(-1.0 * linear_scale, 0.0)
-        elif c == curses.KEY_LEFT:
+
+    d = 100
+    while d > 0:
+        t, c = get_info()
+        if t == False:
             pub_twist(0.0, 1.0 * angular_scale)
-        elif c == curses.KEY_RIGHT:
-            pub_twist(0.0, -1.0 * angular_scale)
-        elif c == 32:
-            pub_twist(0.0, 0.0)
-        elif c == 27 or c == ord('q'):
-            break
+        elif (t == True) and (c != 0):
+            pub_twist(0.0, c*200/250)
+        elif (t == True) and (c == 0):
+            d -= linear_scale
+            pub_twist(1.0*linear_scale, 0.0)
 
     sub.undeclare()
     session.close()
