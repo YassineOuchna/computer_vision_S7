@@ -9,7 +9,7 @@ import zenoh
 import binascii
 import numpy as np
 import json
-
+import capture_video
 parser = argparse.ArgumentParser(
     prog='detect_faces',
     description='zenoh face recognition example display')
@@ -106,10 +106,11 @@ def get_info():
     time.sleep(args.delay)
 
 
-while True:
-    print(get_info())
-    key = cv2.waitKey(1) & 0xFF
-    if key == 27:
-        z.close()
-        cv2.destroyAllWindows()
-        break
+if __name__ == "__main__":
+    while True:
+        print(get_info())
+        key = cv2.waitKey(1) & 0xFF
+        if key == 27:
+            z.close()
+            cv2.destroyAllWindows()
+            break
