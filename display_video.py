@@ -66,15 +66,16 @@ detector = cv2.CascadeClassifier(args.cascade)
 
 sub = z.declare_subscriber(args.prefix + '/cams/*', frames_listener)
 
-while True:
+
+def get_info():
     for cam in list(cams):
         npImage = np.frombuffer(cams[cam], dtype=np.uint8)
         img = cv2.imdecode(npImage, 1)
-
+        w = img.shape[1]
         # OBJECT DETECTION
         info_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        L_limit = np.array([40, 40, 40])  # setting the lower limit
-        U_limit = np.array([80, 255, 255])  # setting the upper limit
+        L_limit = np.array([50, 50, 50])  # setting the lower limit
+        U_limit = np.array([100, 255, 255])  # setting the upper limit
         mask = cv2.inRange(info_hsv, L_limit, U_limit)
         contours, _ = cv2.findContours(
             mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -93,14 +94,22 @@ while True:
                 cv2.circle(img, (cx, cy), 2, (255, 0, 0), -1)
                 cv2.putText(img, f"Center: ({cx}, {cy})", (cx - 50, cy - 20),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                cv2.imshow('Detected Center', img)
+                return True, cx-w/2
             else:
-                print("No center found")
+                cv2.imshow('Detected Center', img)
+                return False, 0
         else:
-            print("No contours found")
+            cv2.imshow('Detected Center', img)
+            return False, 0
 
-        cv2.imshow('Detected Center', img)
-    key = cv2.waitKey(1) & 0xFF
     time.sleep(args.delay)
 
-vs.stop()
-z.close()
+
+while True:
+    print(get_info())
+    key = cv2.waitKey(1) & 0xFF
+    if key == 27:
+        z.close()
+        cv2.destroyAllWindows()
+        break
