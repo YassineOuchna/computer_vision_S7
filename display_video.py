@@ -62,7 +62,7 @@ print('[INFO] Open zenoh session...')
 zenoh.init_logger()
 z = zenoh.open(conf)
 
-detector = cv2.CascadeClassifier(args.cascade)
+# detector = cv2.CascadeClassifier(args.cascade)
 
 sub = z.declare_subscriber(args.prefix + '/cams/*', frames_listener)
 
@@ -95,19 +95,47 @@ def get_info():
                 cv2.putText(img, f"Center: ({cx}, {cy})", (cx - 50, cy - 20),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 cv2.imshow('Detected Center', img)
+
+                with open('data.txt', 'r+') as f:
+                    lines = f.readlines()
+                    if len(lines) >= 10:
+                        lines.pop(0)
+                        f.seek(0)
+                        f.truncate()
+                        f.writelines(lines)
+                    else:
+                        f.write('1' + ' ' + str(cx-w/2) + '\n')
                 return True, cx-w/2
             else:
                 cv2.imshow('Detected Center', img)
+                with open('data.txt', 'r+') as f:
+                    lines = f.readlines()
+                    if len(lines) >= 10:
+                        lines.pop(0)
+                        f.seek(0)
+                        f.truncate()
+                        f.writelines(lines)
+                    else:
+                        f.write('0' + ' ' + '0' + '\n')
                 return False, 0
         else:
             cv2.imshow('Detected Center', img)
+            with open('data.txt', 'r+') as f:
+                lines = f.readlines()
+                if len(lines) >= 10:
+                    lines.pop(0)
+                    f.seek(0)
+                    f.truncate()
+                    f.writelines(lines)
+                else:
+                    f.write('0' + ' ' + '0' + '\n')
             return False, 0
 
     time.sleep(args.delay)
 
 
 while True:
-    print(get_info())
+    get_info()
     key = cv2.waitKey(1) & 0xFF
     if key == 27:
         z.close()

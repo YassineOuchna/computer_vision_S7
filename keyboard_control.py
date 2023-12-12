@@ -21,7 +21,6 @@ import json
 from dataclasses import dataclass
 from pycdr2 import IdlStruct
 from pycdr2.types import int8, int32, uint32, float64
-from display_video import get_info
 
 
 @dataclass
@@ -125,7 +124,7 @@ def main(stdscr):
         print('[{}.{}] [{}]: {}'.format(log.stamp.sec,
                                         log.stamp.nanosec, log.name, log.msg))
 
-    sub = session.declare_subscriber(rosout, rosout_callback)
+    sub1 = session.declare_subscriber(rosout, rosout_callback)
 
     def pub_twist(linear, angular):
         print("Pub twist: {} - {}".format(linear, angular))
@@ -134,10 +133,17 @@ def main(stdscr):
         session.put(cmd_vel, t.serialize())
 
     print("Waiting commands with arrow keys or space bar to stop. Press ESC or 'q' to quit.")
-
-    d = 100
+    t = False
+    c = 0
+    d = 10000
     while d > 0:
-        t, c = get_info()
+        with open('data.txt', 'r') as f:
+            lines = f.readlines()
+            if len(lines) > 0:
+                last = lines[-1].strip()
+                t = (last[0] == '1')
+                c = str(last[2::])
+                print(t, c)
         if t == False:
             pub_twist(0.0, 1.0 * angular_scale)
         elif (t == True) and (c != 0):
@@ -146,7 +152,7 @@ def main(stdscr):
             d -= linear_scale
             pub_twist(1.0*linear_scale, 0.0)
 
-    sub.undeclare()
+    sub1.undeclare()
     session.close()
 
 
