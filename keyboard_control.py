@@ -11,7 +11,8 @@
 # Contributors:
 #   ADLINK zenoh team, <zenoh@adlink-labs.tech>
 #
-
+import math
+import time
 import sys
 from datetime import datetime
 import argparse
@@ -142,15 +143,18 @@ def main(stdscr):
             if len(lines) > 0:
                 last = lines[-1].strip()
                 t = (last[0] == '1')
-                c = str(last[2::])
+                c = math.floor(float(last[2::]))
                 print(t, c)
+                time.sleep(0.15)
         if t == False:
             pub_twist(0.0, 1.0 * angular_scale)
-        elif (t == True) and (c != 0):
-            pub_twist(0.0, c*200/250)
-        elif (t == True) and (c == 0):
-            d -= linear_scale
-            pub_twist(1.0*linear_scale, 0.0)
+            time.sleep(0.15)
+        elif (t == True) and (abs(c)>20):
+            pub_twist(0.0, -c*100/250)
+            time.sleep(0.15)
+        elif (t == True) and (abs(c) < 20):
+            pub_twist(-1.0*linear_scale, 0.0)
+            time.sleep(0.15)
 
     sub1.undeclare()
     session.close()
