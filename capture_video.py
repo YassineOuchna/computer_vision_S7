@@ -10,9 +10,6 @@ import zenoh
 import binascii
 import numpy as np
 
-h = 500
-w = 500
-
 parser = argparse.ArgumentParser(
     prog='capture_video',
     description='zenoh face recognition example video capture')
@@ -59,7 +56,7 @@ time.sleep(1.0)
 
 while True:
     raw = vs.read()
-    frame = imutils.resize(raw, height=h, width=w)
+    frame = imutils.resize(raw, width=500)
 
     _, jpeg = cv2.imencode('.jpg', frame, jpeg_opts)
 

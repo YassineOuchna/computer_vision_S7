@@ -21,7 +21,6 @@ import json
 from dataclasses import dataclass
 from pycdr2 import IdlStruct
 from pycdr2.types import int8, int32, uint32, float64
-from display_video import get_info
 
 
 @dataclass
@@ -109,6 +108,8 @@ def main(stdscr):
     rosout = args.rosout
     angular_scale = args.angular_scale
     linear_scale = args.linear_scale
+    t=False
+    c=0
 
     # zenoh-net code  --- --- --- --- --- --- --- --- --- --- ---
 
@@ -124,8 +125,15 @@ def main(stdscr):
         log = Log.deserialize(sample.payload)
         print('[{}.{}] [{}]: {}'.format(log.stamp.sec,
                                         log.stamp.nanosec, log.name, log.msg))
+    def t_callback(sample):
+        tol=int(sample.payload.decode('utf-8'))==1
+    def c_callback(sample):
+        col=float(sample.payload.decode('utf-8'))
+        print(sample)
 
-    sub = session.declare_subscriber(rosout, rosout_callback)
+    sub1 = session.declare_subscriber(rosout, rosout_callback)
+    sub2 = session.declare_subscriber ('demo/facerecog/'+'t',t_callback)
+    sub3 = session.declare_subscriber('demo/facerecog/c',c_callback)
 
     def pub_twist(linear, angular):
         print("Pub twist: {} - {}".format(linear, angular))
@@ -135,9 +143,9 @@ def main(stdscr):
 
     print("Waiting commands with arrow keys or space bar to stop. Press ESC or 'q' to quit.")
 
-    d = 100
+    d = 10000
     while d > 0:
-        t, c = get_info()
+        print(c)
         if t == False:
             pub_twist(0.0, 1.0 * angular_scale)
         elif (t == True) and (c != 0):
@@ -146,7 +154,9 @@ def main(stdscr):
             d -= linear_scale
             pub_twist(1.0*linear_scale, 0.0)
 
-    sub.undeclare()
+    sub1.undeclare()
+    sub2.undeclare()
+    sub3.undeclare()
     session.close()
 
 

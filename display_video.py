@@ -9,7 +9,7 @@ import zenoh
 import binascii
 import numpy as np
 import json
-import capture_video
+
 parser = argparse.ArgumentParser(
     prog='detect_faces',
     description='zenoh face recognition example display')
@@ -66,7 +66,6 @@ detector = cv2.CascadeClassifier(args.cascade)
 
 sub = z.declare_subscriber(args.prefix + '/cams/*', frames_listener)
 
-
 def get_info():
     for cam in list(cams):
         npImage = np.frombuffer(cams[cam], dtype=np.uint8)
@@ -95,22 +94,24 @@ def get_info():
                 cv2.putText(img, f"Center: ({cx}, {cy})", (cx - 50, cy - 20),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 cv2.imshow('Detected Center', img)
-                return True, cx-w/2
+                z.put(args.prefix + 't', '1')
+                z.put(args.prefix + 'c', str(cx-w/2))
             else:
                 cv2.imshow('Detected Center', img)
-                return False, 0
+                z.put(args.prefix + 't', '0')
+                z.put(args.prefix + 'c', '0')
         else:
             cv2.imshow('Detected Center', img)
-            return False, 0
+            z.put(args.prefix + 't', '0')
+            z.put(args.prefix + 'c','0')
 
     time.sleep(args.delay)
 
 
-if __name__ == "__main__":
-    while True:
-        print(get_info())
-        key = cv2.waitKey(1) & 0xFF
-        if key == 27:
-            z.close()
-            cv2.destroyAllWindows()
-            break
+while True:
+    print(get_info())
+    key = cv2.waitKey(1) & 0xFF
+    if key == 27:
+        z.close()
+        cv2.destroyAllWindows()
+        break
