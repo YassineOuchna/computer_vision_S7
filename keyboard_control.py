@@ -145,16 +145,16 @@ def main(stdscr):
                 t = (last[0] == '1')
                 c = math.floor(float(last[2::]))
                 print(t, c)
-                time.sleep(0.15)
+                time.sleep(0.1)
         if t == False:
             pub_twist(0.0, 1.0 * angular_scale)
-            time.sleep(0.15)
+            time.sleep(0.1)
         elif (t == True) and (abs(c)>20):
             pub_twist(0.0, -c*100/250)
-            time.sleep(0.15)
+            time.sleep(0.1)
         elif (t == True) and (abs(c) < 20):
             pub_twist(-1.0*linear_scale, 0.0)
-            time.sleep(0.15)
+            time.sleep(0.1)
 
     sub1.undeclare()
     session.close()
