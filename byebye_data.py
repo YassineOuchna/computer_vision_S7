@@ -22,7 +22,7 @@ def callback(sample: zenoh.Sample):
     # print(f"Sub: {sample.kind} ('{sample.key_expr}': '{sample.payload.decode('utf-8')}')")
     global count
     count +=1
-    if count>20:
+    if count>5:
         count=0
         with open('data1.txt','w') as f:
             f.write(sample.payload.decode('utf-8')+'\n')

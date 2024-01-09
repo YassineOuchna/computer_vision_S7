@@ -19,7 +19,7 @@ distances = []
 # Function to update the plot in real-time
 def update_plot(frame):
     with open('data1.txt','r') as f:
-        distances.append(f.readlines()[-2][1:].strip('} ]\n').split(','))
+        distances.append(f.readlines()[0][1:].strip('} ]\n').split(','))
     angles.append(np.array([i for i in range(360)]))
     
     line.set_data(angles, distances)
@@ -29,6 +29,6 @@ def update_plot(frame):
 # Set up the animation
 from matplotlib.animation import FuncAnimation
 
-animation = FuncAnimation(fig, update_plot, frames=np.arange(0, 360, 1), interval=50, blit=True)
+animation = FuncAnimation(fig, update_plot, frames=np.arange(0, 360, 1000), interval=50, blit=True)
 
 plt.show()
