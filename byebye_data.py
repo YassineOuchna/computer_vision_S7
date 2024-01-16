@@ -22,14 +22,14 @@ def callback(sample: zenoh.Sample):
     # print(f"Sub: {sample.kind} ('{sample.key_expr}': '{sample.payload.decode('utf-8')}')")
     global count
     count +=1
-    if count>5:
+    if count>20:
         count=0
         with open('data1.txt','w') as f:
-            f.write(sample.payload.decode('utf-8')+'\n')
+            f.write(sample.payload.decode('utf-8'))
 
     else: 
         with open('data1.txt','a') as f:
-            f.write(sample.payload.decode('utf-8')+'\n')
+            f.write(sample.payload.decode('utf-8'))
 
 # "Open" zenoh
 print("Opening session...")
