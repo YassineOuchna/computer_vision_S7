@@ -1,0 +1,16 @@
+imgs/new_images\new_im16.png 1 137 200 220 261
+imgs/new_images\new_im17.png 1 78 141 247 303
+imgs/new_images\new_im18.png 1 16 176 254 297
+imgs/new_images\new_im19.png 1 65 178 247 300
+imgs/new_images\new_im20.png 1 65 175 263 300
+imgs/new_images\new_im21.png 1 37 171 250 288
+imgs/new_images\new_im22.png 1 81 166 244 256
+imgs/new_images\new_im23.png 1 168 174 234 303
+imgs/new_images\new_im24.png 1 148 166 255 302
+imgs/new_images\new_im25.png 1 197 174 221 256
+imgs/new_images\new_im26.png 1 293 178 180 257
+imgs/new_images\new_im27.png 1 248 175 194 276
+imgs/new_images\new_im28.png 1 248 175 195 283
+imgs/new_images\new_im29.png 1 249 177 191 282
+imgs/new_images\new_im30.png 1 163 178 266 295
+imgs/new_images\new_im31.png 1 173 174 204 239
