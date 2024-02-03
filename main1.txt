@@ -1,0 +1,3 @@
+ssh pi@{}
+cd zenoh-demos/turtlebot3/zdrive-python
+python zdrive.py -l tcp/0.0.0.0:7447

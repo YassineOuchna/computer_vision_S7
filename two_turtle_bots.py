@@ -128,45 +128,61 @@ def main(stdscr):
     sub1 = session.declare_subscriber(rosout, rosout_callback)
 
     def pub_twist(linear, angular):
-        #print("Pub twist: {} - {}".format(linear, angular))
+        print("Pub twist: {} - {}".format(linear, angular))
         t = Twist(linear=Vector3(x=linear, y=0.0, z=0.0),
                   angular=Vector3(x=0.0, y=0.0, z=angular))
         session.put(cmd_vel, t.serialize())
+    def getdata():
+        return 20,20,0,90
 
     print("Waiting commands with arrow keys or space bar to stop. Press ESC or 'q' to quit.")
-    t = False
-    c = 0
-    d = 10000
-    counter=0
-    s=[]
-    while (d >0.35):
+    #t1 and t2 indicates if there is a turtlebot and an object respectively
+    #here we will get 2 distances d1 is the distance between the two turtlebots d2 is the distance between the turtlebot that has a camera and the object
+    #we will also get 2 angles: a1 the local angle of the turtlebot and a2 the local angle of the object
+    #we will calculate d3 the distance between the blind turtlebot and the object and a3 the angle between them
+    t1,t2,d1,d2,a1,a2=getdata()
+    d3=d1**2+d2**2-2*d1*d2*math.cos(a1-a2)
+    count=60
+    while d3 > 0:
         with open('data.txt', 'r') as f:
             lines = f.readlines()
             if len(lines) > 0:
                 last = lines[-1].strip()
-                t = (last[0] == '1')
-                c = math.floor(float(last[2::]))
+                t1 = (last[0] == '1')
+                t2=(last[1]=='1')
+                a1=math.floor(float(last[2]))
+                a2=math.floor(float(last[3]))
                 time.sleep(0.1)
-        if t == False:
+        if count==60:
+            with open('data1.txt','r') as f:
+                lines=f.readlines()
+                if len(lines)>1:
+                    last=lines[-2].strip()
+                    d1=last.split(',')[a1]
+                    d2=last.split(',')[a2]
+                    count=0
+            d3=d1**2+d2**2-2*d1*d2*math.cos(a1-a2)
+            with open('data2.txt','r') as f:
+                lines=f.readlines()
+                if len(lines)>1:
+                    last=lines[-2].strip()
+                    
+                    
+        
+        if (t2==False):
+            continue
+        elif t1 == False:
             pub_twist(0.0, 1.0 * angular_scale)
             time.sleep(0.1)
-        elif (t == True) and (abs(c)>40):
+        elif (t1 == True) and (abs(c)>20):
             pub_twist(0.0, -c*100/250)
             time.sleep(0.1)
-        elif (t == True) and (abs(c) < 40):
-            with open('data1.txt','r') as f:
-                L=f.readlines()[-2].strip('\n')
-            counter+=1
-            if counter>28:
-                counter=0
-            d=min([float(i) for i in L.split(',')[170:190] if float(i)!=0.0])-(0.2/28)*counter
-            s.append(d)
+        elif (t1 == True) and (abs(c) < 20):
             pub_twist(-1.0*linear_scale, 0.0)
             time.sleep(0.1)
 
     sub1.undeclare()
     session.close()
 
-    print(s)
+
 curses.wrapper(main)
-#python keyboard_control.py -e tcp/192.168.137.164 -x 10 -a 100

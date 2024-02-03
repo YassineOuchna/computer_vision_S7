@@ -1,0 +1,3 @@
+ssh pi@{}
+cd Desktop
+python lidar_devloped.py -e tcp/192.168.137.1:7500
